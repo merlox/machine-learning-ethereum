@@ -7,16 +7,13 @@ class LinearRegression:
     def __init__(self):
         initialWeight = uniform(0, 1)
         initialBias = uniform(0, 1)
-        learningRate = 0.1
-        iterations = 100
+        learningRate = 0.00000004
+        iterations = 20000
 
-        print('Initial weight {}'.format(initialWeight))
-        print('Initial bias {}'.format(initialBias))
-        print('Learning rate {}'.format(learningRate))
-        print('Iterations {}'.format(iterations))
+        print('Initial weight {}, Initial bias {}, Learning rate {}, Iterations {}'.format(initialWeight, initialBias, learningRate, iterations))
         finalWeight, finalBias = self.train(self.results, initialWeight, initialBias, self.xs, learningRate, iterations)
-        print('Final weight {}'.format(finalWeight))
-        print('Final bias {}'.format(finalBias))
+        finalError = self.cost(self.results, finalWeight, finalBias, self.xs)
+        print('Final weight {:.4f}, Final bias {:.4f}, Final error {:.4f}, Prediction {:.4f}, Prediction Two {:.4f}'.format(finalWeight, finalBias, finalError, self.prediction(self.xs[1], finalWeight, finalBias), self.prediction(self.xs[3], finalWeight, finalBias)))
 
     # Python implementation
     def prediction(self, x, weight, bias):
@@ -36,11 +33,12 @@ class LinearRegression:
         biasDerivative = 0
         numberOfDataPoints = len(results)
         for i in range(numberOfDataPoints):
-            weightDerivative += (-2 * xs[i] * (results[i] - (xs[i] * weight + bias)) / numberOfDataPoints)
-            biasDerivative += (-2 * (results[i] - (xs[i] * weight + bias)) / numberOfDataPoints)
+            weightDerivative += -2 * xs[i] * (results[i] - (xs[i] * weight + bias))
+            biasDerivative += -2 * (results[i] - (xs[i] * weight + bias))
 
-        weight -= weightDerivative * learningRate
-        bias -= biasDerivative * learningRate
+        weight -= (weightDerivative / numberOfDataPoints) * learningRate
+        bias -= (biasDerivative / numberOfDataPoints) * learningRate
+
         return weight, bias
 
     # Python implementation
