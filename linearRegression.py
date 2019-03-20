@@ -8,12 +8,12 @@ class LinearRegression:
         initialWeight = uniform(0, 1)
         initialBias = uniform(0, 1)
         learningRate = 0.00000004
-        iterations = 20000
+        iterations = 2000
 
         print('Initial weight {}, Initial bias {}, Learning rate {}, Iterations {}'.format(initialWeight, initialBias, learningRate, iterations))
         finalWeight, finalBias = self.train(self.results, initialWeight, initialBias, self.xs, learningRate, iterations)
         finalError = self.cost(self.results, finalWeight, finalBias, self.xs)
-        print('Final weight {:.4f}, Final bias {:.4f}, Final error {:.4f}, Prediction {:.4f}, Prediction Two {:.4f}'.format(finalWeight, finalBias, finalError, self.prediction(self.xs[1], finalWeight, finalBias), self.prediction(self.xs[3], finalWeight, finalBias)))
+        print('Final weight {:.4f}, Final bias {:.4f}, Final error {:.4f}, Prediction {:.4f} out of {}, Prediction Two {:.4f} out of {}'.format(finalWeight, finalBias, finalError, self.prediction(self.xs[1], finalWeight, finalBias), self.results[1], self.prediction(self.xs[3], finalWeight, finalBias), self.results[3]))
 
     # Python implementation
     def prediction(self, x, weight, bias):
@@ -47,7 +47,7 @@ class LinearRegression:
         for i in range(iterations):
             weight, bias = self.optimizeWeightBias(results, weight, bias, xs, learningRate)
             error = self.cost(results, weight, bias, xs)
-            print("Iteration: {}, weight: {:.4f}, bias: {:.4f}, error: {:.2}".format(i, weight, bias, error))
+            print("Iteration: {}, weight: {:.4f}, bias: {:.4f}, error: {:.2f}".format(i, weight, bias, error))
         return weight, bias
 
 # Initialize the class
