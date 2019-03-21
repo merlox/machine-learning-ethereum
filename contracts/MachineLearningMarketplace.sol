@@ -9,8 +9,6 @@ contract MachineLearningMarketplace {
     struct Model {
         uint256 id;
         string datasetUrl;
-        uint256 result;
-        uint256 x;
         uint256 weight;
         uint256 bias;
         uint256 payment;
@@ -25,9 +23,9 @@ contract MachineLearningMarketplace {
     /// @param _dataSetUrl The url with the json containing the array of data
     /// @param _result One resulting data element
     /// @param _x An independent variable
-    function uploadJob(string memory _dataSetUrl, uint256 _result, uint256 _x) public payable {
+    function uploadJob(string memory _dataSetUrl) public payable {
         require(msg.value > 0, 'You must send some ether to get your model trained');
-        Model memory m = Model(latestId, _dataSetUrl, _result, _x, 0, 0, msg.value, now, msg.sender);
+        Model memory m = Model(latestId, _dataSetUrl, 0, 0, msg.value, now, msg.sender);
         models[latestId] = m;
         emit AddedJob(latestId, now);
         latestId += 1;
@@ -38,7 +36,7 @@ contract MachineLearningMarketplace {
     /// @param _weight The final trained weight
     /// @param _bias The final trained bias
     function uploadResult(uint256 _id, uint256 _weight, uint256 _bias) public {
-        Model memory m = Model(_id, models[_id].datasetUrl, models[_id].result, models[_id].x, _weight, _bias, models[_id].payment, now, msg.sender);
+        Model memory m = Model(_id, models[_id].datasetUrl, _weight, _bias, models[_id].payment, now, msg.sender);
         trainedModels[_id].push(m);
         emit AddedResult(_id, now, msg.sender);
     }
