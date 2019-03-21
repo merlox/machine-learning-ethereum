@@ -9,6 +9,19 @@ ganache.listen(8545, (err, blockchain) => {
 
 contract('MachineLearningMarketplace', accounts => {
     beforeEach(async () => {
-        console.log('What up')
+        machineLearningMarketplace = await MachineLearningMarketplace.new()
+    })
+    it('Should upload a new job model successfully', async () => {
+        const datasetUrl = 'https://example.com'
+        const payment = 100000000000000000 // 0.1 ether
+        await machineLearningMarketplace.uploadJob(datasetUrl, { value: payment })
+        const uploadedModel = await machineLearningMarketplace.getModel(0)
+        uploadedModel[0].should.equal(datasetUrl)
+        parseInt(uploadedModel[1]).should.equal(payment)
+    })
+    it('Should upload a result', async () => {
+
+    })
+    it('Should choose a winning model', async () => {
     })
 })

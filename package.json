@@ -11,5 +11,9 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^4.2.0",
+    "ganache-cli": "^6.4.1"
+  }
 }
