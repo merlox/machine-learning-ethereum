@@ -31,8 +31,8 @@ contract MachineLearningMarketplace {
 
     /// @notice To upload the result of a trained model
     /// @param _id The id of the trained model
-    /// @param _weight The final trained weight
-    /// @param _bias The final trained bias
+    /// @param _weight The final trained weight, it must be with 10 decimals meaning that 1 weight is 1e10 so that you can do smaller fractions such as 0.01 which would be 1e8 or 100000000
+    /// @param _bias The final trained bias, it must be with 10 decimals as the weight
     function uploadResult(uint256 _id, uint256 _weight, uint256 _bias) public {
         Model memory m = Model(_id, models[_id].datasetUrl, _weight, _bias, models[_id].payment, now, msg.sender);
         trainedModels[_id].push(m);
