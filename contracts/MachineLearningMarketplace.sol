@@ -16,18 +16,28 @@ contract MachineLearningMarketplace {
         uint256 timestamp;
     }
     mapping(uint256 => Model) public models;
+    mapping(uint256 => mapping(address => Model)) public trainedModels;
     uint256 public latestId;
 
     /// @notice To upload a model in order to train it
     /// @param _dataSetUrl The url with the json containing the array of data
-    /// @param result One resulting data element
-    /// @param x An independent variable
-    function uploadJob(string memory _dataSetUrl, uint256 result, uint256 x) public payable {
+    /// @param _result One resulting data element
+    /// @param _x An independent variable
+    function uploadJob(string memory _dataSetUrl, uint256 _result, uint256 _x) public payable {
         require(msg.value > 0, 'You must send some ether to get your model trained');
 
-        Model memory m = Model(_dataSetUrl, result, x, 0, 0, msg.value, now);
+        Model memory m = Model(_dataSetUrl, _result, _x, 0, 0, msg.value, now);
         models[latestId] = m;
         emit AddedJob(latestId, now);
+    }
+
+    /// @notice To upload the result of a trained model
+    /// @param _id The id of the trained model
+    /// @param _weight The final trained weight
+    /// @param _bias The final trained bias
+    function uploadResult(uint256 _id, uint256 _weight, uint256 _bias) public {
+        Model memory m = Model(models[_id].datasetUrl, models[_id].result, models[_id].x, _weight, _bias, models[_id].payment, now);
+        trainedModels[_id][msg.sender] = m;
     }
 
     /// @notice The cost function implemented in solidity
