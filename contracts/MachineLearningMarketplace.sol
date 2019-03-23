@@ -15,6 +15,7 @@ contract MachineLearningMarketplace {
         uint256 payment;
         uint256 timestamp;
         address payable owner;
+        bool isOpen;
     }
     mapping(uint256 => Model) public models;
     mapping(uint256 => Model[]) public trainedModels;
@@ -24,7 +25,7 @@ contract MachineLearningMarketplace {
     /// @param _dataSetUrl The url with the json containing the array of data
     function uploadJob(string memory _dataSetUrl) public payable {
         require(msg.value > 0, 'You must send some ether to get your model trained');
-        Model memory m = Model(latestId, _dataSetUrl, 0, 0, msg.value, now, msg.sender);
+        Model memory m = Model(latestId, _dataSetUrl, 0, 0, msg.value, now, msg.sender, true);
         models[latestId] = m;
         emit AddedJob(latestId, now);
         latestId += 1;
@@ -35,7 +36,7 @@ contract MachineLearningMarketplace {
     /// @param _weight The final trained weight, it must be with 10 decimals meaning that 1 weight is 1e10 so that you can do smaller fractions such as 0.01 which would be 1e8 or 100000000
     /// @param _bias The final trained bias, it must be with 10 decimals as the weight
     function uploadResult(uint256 _id, uint256 _weight, uint256 _bias) public {
-        Model memory m = Model(_id, models[_id].datasetUrl, _weight, _bias, models[_id].payment, now, msg.sender);
+        Model memory m = Model(_id, models[_id].datasetUrl, _weight, _bias, models[_id].payment, now, msg.sender, true);
         trainedModels[_id].push(m);
         emit AddedResult(_id, now, msg.sender);
     }
@@ -46,10 +47,12 @@ contract MachineLearningMarketplace {
     function chooseResult(uint256 _id, uint256 _arrayIdSelected) public {
         Model memory m = models[_id];
         Model[] memory t = trainedModels[_id];
+        require(m.isOpen, 'The job must be open to choose a result');
         // If 3 days have passed the winner will be the first one, otherwise the owner is allowed to choose a winner before 3 full days
         if(now - m.timestamp < 3 days) {
             require(msg.sender == m.owner, 'Only the owner can select the winner');
             t[_arrayIdSelected].owner.transfer(m.payment);
+            models[_id].isOpen = false;
             emit SelectedWinner(_id, now, t[_arrayIdSelected].owner, t[_arrayIdSelected].id);
         } else {
             // If there's more than one result, send it to the first
@@ -61,6 +64,7 @@ contract MachineLearningMarketplace {
                 m.owner.transfer(m.payment);
                 emit SelectedWinner(_id, now, msg.sender, 0);
             }
+            models[_id].isOpen = false;
         }
     }
 
