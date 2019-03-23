@@ -82,4 +82,24 @@ contract MachineLearningMarketplace {
     function getModel(uint256 id) public view returns(string memory, uint256, uint256) {
         return (models[id].datasetUrl, models[id].payment, models[id].timestamp);
     }
+
+    /// @notice To get all the proposed trained models for a particular id
+    /// @param _id The id of the model created by the buyer
+    /// @return uint256[], uint256[], uint256[], uint256[], address[] Returns all those trained models separated in arrays containing ids, weights, biases, timestamps and owners
+    function getAllTrainedModels(uint256 _id) public view returns(uint256[] memory, uint256[] memory, uint256[] memory, uint256[] memory, address[] memory) {
+        uint256[] memory ids;
+        uint256[] memory weights;
+        uint256[] memory biases;
+        uint256[] memory timestamps;
+        address[] memory owners;
+        for(uint256 i = 0; i < trainedModels[_id].length; i++) {
+            Model memory m = trainedModels[_id][i];
+            ids[i] = m.id;
+            weights[i] = m.weight;
+            biases[i] = m.bias;
+            timestamps[i] = m.timestamp;
+            owners[i] = m.owner;
+        }
+        return (ids, weights, biases, timestamps, owners);
+    }
 }
