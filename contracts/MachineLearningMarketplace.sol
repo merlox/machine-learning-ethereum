@@ -1,10 +1,11 @@
 // We need a way for buyers and sellers to interact, a function to place an order for training a model and a function to submit training by sellers after they've trained the model with their results. The sellers will upload the dataset json url they got and the resulting weight and bias. The buyers will upload 1 or more datasets with an array of URLs which have to be json files that can be uploaded for free on github, from 1 to 10 elements of data to verify the cost of the trained model and the payment for training. Each model will have a maximum time of 3 days to be trained which means that the buyer has to choose a winner before 3 full days.
 // We also need functions to verify the quality of the trained model which will be done with a simple cost function that will return the error for a particular data field.
-pragma solidity ^0.5.4;
+pragma solidity 0.5.5;
 
 contract MachineLearningMarketplace {
     event AddedJob(uint256 indexed id, uint256 indexed timestamp);
     event AddedResult(uint256 indexed id, uint256 indexed timestamp, address indexed sender);
+    event SelectedWinner(uint256 indexed id, uint256 indexed timestamp, address indexed winner, uint256 trainedIdSelected);
 
     struct Model {
         uint256 id;
@@ -49,13 +50,16 @@ contract MachineLearningMarketplace {
         if(now - m.timestamp < 3 days) {
             require(msg.sender == m.owner, 'Only the owner can select the winner');
             t[_arrayIdSelected].owner.transfer(m.payment);
+            emit SelectedWinner(_id, now, t[_arrayIdSelected].owner, t[_arrayIdSelected].id);
         } else {
             // If there's more than one result, send it to the first
             if(t.length > 0) {
                 t[0].owner.transfer(m.payment);
+                emit SelectedWinner(_id, now, t[0].owner, t[0].id);
             } else {
                 // Send it to the owner if none applied to the job
                 m.owner.transfer(m.payment);
+                emit SelectedWinner(_id, now, msg.sender, 0);
             }
         }
     }
